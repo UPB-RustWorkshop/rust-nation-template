@@ -1,0 +1,16 @@
+[package]
+name = "microbit_v2"
+version.workspace = true
+authors.workspace = true
+build = "build.rs"
+edition.workspace = true
+
+[dependencies]
+cortexm4 = { git = "https://github.com/tock/tock.git", branch = "master" }
+capsules = { git = "https://github.com/tock/tock.git", branch = "master" }
+kernel = { git = "https://github.com/tock/tock.git", branch = "master" }
+nrf52 = { git = "https://github.com/tock/tock.git", branch = "master" }
+nrf52833 = { git = "https://github.com/tock/tock.git", branch = "master" }
+components = { git = "https://github.com/tock/tock.git", branch = "master" }
+nrf52_components = { git = "https://github.com/tock/tock.git", branch = "master" }
+drivers = { path = "../drivers" }

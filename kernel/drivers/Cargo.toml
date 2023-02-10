@@ -1,0 +1,8 @@
+[package]
+name = "drivers"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+kernel = { git = "https://github.com/tock/tock.git", branch = "master" }
