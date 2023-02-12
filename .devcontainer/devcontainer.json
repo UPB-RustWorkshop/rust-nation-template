@@ -1,0 +1,18 @@
+{
+    "build": { "dockerfile": "Dockerfile" },
+    "hostRequirements": {
+        "cpus": 16,
+        "memory": "16gb",
+        "storage": "128gb" 
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "bungcip.better-toml"
+            ]
+        }
+    },
+    "containerUser": "codespace",
+    "remoteUser": "codespace"
+}
