@@ -1,9 +1,9 @@
 [submodule "tock"]
-	path = tock
+	path = kernel/tock
 	url = https://github.com/tock/tock.git
 [submodule "libtock-c"]
-	path = libtock-c
+	path = applications/c/libtock-c
 	url = https://github.com/tock/libtock-c.git
 [submodule "libtock-rs"]
-	path = libtock-rs
+	path = applications/rust/libtock-rs
 	url = https://github.com/tock/libtock-rs.git

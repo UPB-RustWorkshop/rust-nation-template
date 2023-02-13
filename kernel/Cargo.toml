@@ -1,12 +1,12 @@
 [workspace]
 members = [
-    "kernel/microbit_v2",
-    "kernel/pico_explorer_base",
-    "kernel/raspberry_pi_pico",
-    "kernel/drivers"
+    "microbit_v2",
+    "pico_explorer_base",
+    "raspberry_pi_pico",
+    "drivers",
 ]
 exclude = [
-   "tock"
+   "tock",
 ]
 
 [workspace.package]

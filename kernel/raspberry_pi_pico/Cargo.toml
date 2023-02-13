@@ -6,10 +6,10 @@ build = "build.rs"
 edition.workspace = true
 
 [dependencies]
-cortexm0p = { path = "../../tock/arch/cortex-m0p" }
-capsules = { path = "../../tock/capsules" }
-kernel = { path = "../../tock/kernel" }
-rp2040 = { path = "../../tock/chips/rp2040" }
-components = { path = "../../tock/boards/components" }
-enum_primitive = { path = "../../tock/libraries/enum_primitive" }
+cortexm0p = { path = "../tock/arch/cortex-m0p" }
+capsules = { path = "../tock/capsules" }
+kernel = { path = "../tock/kernel" }
+rp2040 = { path = "../tock/chips/rp2040" }
+components = { path = "../tock/boards/components" }
+enum_primitive = { path = "../tock/libraries/enum_primitive" }
 drivers = { path = "../drivers" }

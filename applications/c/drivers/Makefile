@@ -1,7 +1,7 @@
 # Base folder definitions
-TOCK_USERLAND_BASE_DIR ?= ../../libtock-c
+TOCK_USERLAND_BASE_DIR ?= ../libtock-c
 LIBNAME := drivers
-$(LIBNAME)_DIR := $(TOCK_USERLAND_BASE_DIR)/../applications/$(LIBNAME)
+$(LIBNAME)_DIR := $(TOCK_USERLAND_BASE_DIR)/../$(LIBNAME)
 
 # List all C and Assembly files
 $(LIBNAME)_SRCS  := $(wildcard $($(LIBNAME)_DIR)/*.c)

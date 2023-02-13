@@ -4,7 +4,7 @@ TOCK_ARCH=cortex-m0p
 TARGET=thumbv6m-none-eabi
 PLATFORM=pico_explorer_base
 
-include ../../tock/boards/Makefile.common
+include ../tock/boards/Makefile.common
 
 OPENOCD=openocd
 OPENOCD_OPTIONS=-f openocd.cfg

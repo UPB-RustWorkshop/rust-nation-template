@@ -40,5 +40,8 @@ RUN git clone https://github.com/rej696/elf2uf2.git &&\
 # Install elf2tab from source
 RUN cargo install --git https://github.com/tock/elf2tab.git
 
+# Install runner from source
+RUN cargo install --git https://github.com/tock/libtock-rs.git runner
+
 # Install Rust nightly
 RUN rustup install nightly-2022-10-22

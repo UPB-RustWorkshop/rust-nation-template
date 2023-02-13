@@ -6,10 +6,10 @@ build = "build.rs"
 edition.workspace = true
 
 [dependencies]
-cortexm4 = { path = "../../tock/arch/cortex-m4" }
-capsules = { path = "../../tock/capsules" }
-kernel = { path = "../../tock/kernel" }
-nrf52 = { path = "../../tock/chips/nrf52" }
-nrf52833 = { path = "../../tock/chips/nrf52833" }
-components = { path = "../../tock/boards/components" }
+cortexm4 = { path = "../tock/arch/cortex-m4" }
+capsules = { path = "../tock/capsules" }
+kernel = { path = "../tock/kernel" }
+nrf52 = { path = "../tock/chips/nrf52" }
+nrf52833 = { path = "../tock/chips/nrf52833" }
+components = { path = "../tock/boards/components" }
 drivers = { path = "../drivers" }
