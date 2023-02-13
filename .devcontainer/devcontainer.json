@@ -1,9 +1,9 @@
 {
     "build": { "dockerfile": "Dockerfile" },
     "hostRequirements": {
-        "cpus": 16,
-        "memory": "16gb",
-        "storage": "128gb" 
+        "cpus": 2,
+        "memory": "4gb",
+        "storage": "32gb" 
     },
     "customizations": {
         "vscode": {
@@ -14,5 +14,6 @@
         }
     },
     "containerUser": "codespace",
-    "remoteUser": "codespace"
+    "remoteUser": "codespace",
+    "postCreateCommand": "git submodule update --init"
 }

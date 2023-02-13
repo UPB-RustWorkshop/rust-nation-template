@@ -25,9 +25,6 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 # Add .cargo/bin to PATH
 ENV PATH="/home/codespace/.cargo/bin:${PATH}"
 
-# Run cargo
-RUN cargo --help
-
 # Install ARM GCC
 RUN sudo apt-get install -y gcc-arm-none-eabi
 
