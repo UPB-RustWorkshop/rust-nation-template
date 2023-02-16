@@ -49,4 +49,4 @@ RUN rustup install nightly-2022-10-22
 # Install thumbv6 architecture
 RUN rustup target add thumbv6m-none-eabi
 RUN rustup +nightly-2022-10-22 target add thumbv6m-none-eabi
-RUN rustup +nightly-2022-10-22 component add llvm-tools-preview
+RUN rustup +nightly-2022-10-22 component add rust-src llvm-tools-preview
