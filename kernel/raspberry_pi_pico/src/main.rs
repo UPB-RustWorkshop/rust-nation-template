@@ -346,6 +346,12 @@ pub unsafe fn main() {
         ]
     );
 
+    let reboot = static_init!(dyn Fn(), || {
+        panic!("Reboot");
+
+        peripherals.watchdog.reboot();
+    });
+
     let cdc = components::cdc::CdcAcmComponent::new(
         &peripherals.usb,
         //capsules::usb::cdc::MAX_CTRL_PACKET_SIZE_RP2040,
@@ -355,7 +361,7 @@ pub unsafe fn main() {
         strings,
         mux_alarm,
         dynamic_deferred_caller,
-        Some(&baud_rate_reset_bootloader_enter),
+        Some(reboot),
     )
     .finalize(components::cdc_acm_component_static!(
         rp2040::usb::UsbCtrl,

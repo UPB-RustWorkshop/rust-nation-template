@@ -48,13 +48,11 @@ mod flash_bootloader;
 #[link_section = ".stack_buffer"]
 pub static mut STACK_MEMORY: [u8; 0x1500] = [0; 0x1500];
 
-// Function for the CDC/USB stack used to ask the MCU to reset into
-// tockbootloader.
-fn baud_rate_reset_bootloader_enter() {
-    // unsafe {
-    // cortexm0::scb::reset();
-    // }
-    // TODO reset into bootloader
+// Function for the process console to reboot the raspberry pi pico.
+fn reboot_function() {
+    unsafe {
+        cortexm0p::scb::reset();
+    }
 }
 
 // Manually setting the boot header section that contains the FCB header
@@ -359,7 +357,7 @@ pub unsafe fn main() {
         strings,
         mux_alarm,
         dynamic_deferred_caller,
-        Some(&baud_rate_reset_bootloader_enter),
+        Some(&reboot_function),
     )
     .finalize(components::cdc_acm_component_static!(
         rp2040::usb::UsbCtrl,
@@ -403,16 +401,14 @@ pub unsafe fn main() {
         components::gpio_component_helper!(
             RPGpioPin,
             // Used for serial communication. Comment them in if you don't use serial.
+            // 0 => &peripherals.pins.get_pin(RPGpio::GPIO0),
+            // 1 => &peripherals.pins.get_pin(RPGpio::GPIO1),
             2 => &peripherals.pins.get_pin(RPGpio::GPIO2),
             3 => &peripherals.pins.get_pin(RPGpio::GPIO3),
             4 => &peripherals.pins.get_pin(RPGpio::GPIO4),
             5 => &peripherals.pins.get_pin(RPGpio::GPIO5),
             6 => &peripherals.pins.get_pin(RPGpio::GPIO6),
             7 => &peripherals.pins.get_pin(RPGpio::GPIO7),
-            8 => &peripherals.pins.get_pin(RPGpio::GPIO8),
-            9 => &peripherals.pins.get_pin(RPGpio::GPIO9),
-            10 => &peripherals.pins.get_pin(RPGpio::GPIO10),
-            11 => &peripherals.pins.get_pin(RPGpio::GPIO11),
             20 => &peripherals.pins.get_pin(RPGpio::GPIO20),
             21 => &peripherals.pins.get_pin(RPGpio::GPIO21),
             22 => &peripherals.pins.get_pin(RPGpio::GPIO22),
@@ -555,6 +551,7 @@ pub unsafe fn main() {
         uart_mux,
         mux_alarm,
         process_printer,
+        Some(&reboot_function)
     )
     .finalize(components::process_console_component_static!(RPTimer));
     let _ = process_console.start();
