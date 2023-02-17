@@ -71,6 +71,9 @@ Follow the staps to to this:
 
 > Hint: use `static_init!` get a reference to the driver
 
+### Build the kernel
+To build the kernel run `make` in the `smarthome` folder.
+
 ### Flash the kernel
 To flash the kernel to the board, run the `make kernel`. This will create a UF2 file in `build/kernel.uf2`. Copy this file to the Pi's USB driver.
 
@@ -110,6 +113,9 @@ tock$ reset
 ## Service (Rust)
 Write a rust application that implements the logic of the smart home.
 
+### Build
+To build the app, run `make raspberry_pi_pico` in the app folder.
+
 ### Driver API
 
 The first step is to implement the driver API that talks to the smarthome driver.
@@ -125,3 +131,30 @@ Implement the services as an infinte loop that does the following:
 3. reads the temperature
 4. sends the it to the driver
 5. waits for a few milliseconds
+
+## Flashing the apps
+The smarthome will run two apps:
+- the UI app
+- the service app
+
+To load both of the app, the `make app` command does the following:
+- builds the kernel as an ELF file
+- builds the UI app as a TBF file
+- builds the service app as a TBF file
+- merges the two TBF files (UI and service, in this order)
+- writes the merged TBFs as the `.apps` section of the kernel ELF file
+- converts the ELF file to a UF2
+
+### Relocation
+While the UI app is relocatable, meaning that it can be loaded at any address, 
+the service app is not. It uses a fixed loading address 
+where it loads. That address depends on the size of
+the UI app. To figure out the address that the Rust app
+has to ooad to, follow:
+- enable the *debug_load_processes* feature for the `kernel` crate
+- load the UF2 file with the apps
+- the kernel will print the required address
+  - first it prints the Flash address, modify it and reflash the app
+  - then it prints the RAM address
+
+Modify the `layouts/raspberry_pi_pico.ld` file and set the required addresses for the FLASH and RAM.
