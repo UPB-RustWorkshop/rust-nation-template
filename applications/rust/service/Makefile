@@ -1,0 +1,238 @@
+# By default, let's print out some help
+.PHONY: usage
+usage:
+	@echo "$$(tput bold)Welcome to libtock-rs!$$(tput sgr0)"
+	@echo
+	@echo "First things first, if you haven't yet, check out Tocks's doc/Getting_Started."
+	@echo "After that read the README from libtock-rs"
+	@echo "You'll need to install a few requirements before we get going."
+	@echo
+	@echo "The next step is to choose a board to build Tock for. Mainline"
+	@echo "libtock-rs currently includes support for the following platforms:"
+	@echo " - hail"
+	@echo " - nrf52840"
+	@echo " - microbit_v2"
+	@echo " - nucleo_f429zi"
+	@echo " - nucleo_f446re"
+	@echo " - opentitan"
+	@echo " - hifive1"
+	@echo " - nrf52"
+	@echo " - imxrt1050"
+	@echo " - apollo3"
+	@echo " - stm32f3discovery"
+	@echo " - stm32f412gdiscovery"
+	@echo " - esp32_c3_devkitm_1"
+	@echo " - clue_nrf52840"
+	@echo
+	@echo "Run 'make <board>' to build the app for that board."
+	@echo "Run 'make flash-<board>' to flash the app to a tockloader-supported board."
+
+ifdef FEATURES
+features=--features=$(FEATURES)
+endif
+
+ifndef DEBUG
+release=--release
+endif
+
+APP_NAME := $(shell basename $$(pwd))
+
+# Arguments to pass to cargo to exclude crates that require a Tock runtime.
+# This is largely libtock_runtime and crates that depend on libtock_runtime.
+# Used when we need to build a crate for the host OS, as libtock_runtime only
+# supports running on Tock.
+EXCLUDE_RUNTIME := --exclude libtock --exclude libtock_runtime \
+	--exclude libtock_debug_panic --exclude libtock_small_panic
+
+# Arguments to pass to cargo to exclude crates that cannot be tested by Miri. In
+# addition to excluding libtock_runtime, Miri also cannot test proc macro crates
+# (and in fact will generate broken data that causes cargo test to fail).
+EXCLUDE_MIRI := $(EXCLUDE_RUNTIME) --exclude ufmt-macros
+
+# Arguments to pass to cargo to exclude `std` and crates that depend on it. Used
+# when we build a crate for an embedded target, as those targets lack `std`.
+EXCLUDE_STD := --exclude libtock_unittest --exclude print_sizes \
+               --exclude runner --exclude syscalls_tests
+
+.PHONY: apollo3
+apollo3:
+	LIBTOCK_PLATFORM=apollo3 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/apollo3
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/apollo3
+
+.PHONY: esp32_c3_devkitm_1
+esp32_c3_devkitm_1:
+	LIBTOCK_PLATFORM=esp32_c3_devkitm_1 cargo run $(features) \
+		--target=riscv32imc-unknown-none-elf $(release)
+	mkdir -p target/tbf/esp32_c3_devkitm_1
+	cp target/riscv32imc-unknown-none-elf/release/$(APP_NAME).tab \
+		target/riscv32imc-unknown-none-elf/release/$(APP_NAME).tbf \
+		target/tbf/esp32_c3_devkitm_1
+
+.PHONY: hail
+hail:
+	LIBTOCK_PLATFORM=hail cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/hail
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/hail
+
+.PHONY: flash-hail
+flash-hail:
+	LIBTOCK_PLATFORM=hail cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release) -- --deploy=tockloader
+
+.PHONY: microbit_v2
+microbit_v2:
+	LIBTOCK_PLATFORM=microbit_v2 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/microbit_v2
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/microbit_v2
+
+.PHONY: flash-microbit_v2
+flash-microbit_v2:
+	LIBTOCK_PLATFORM=microbit_v2 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release) -- --deploy=tockloader
+
+.PHONY: nucleo_f429zi
+nucleo_f429zi:
+	LIBTOCK_PLATFORM=nucleo_f429zi cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/nucleo_f429zi
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/nucleo_f429zi
+
+.PHONY: nucleo_f446re
+nucleo_f446re:
+	LIBTOCK_PLATFORM=nucleo_f446re cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/nucleo_f446re
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/nucleo_f446re
+
+.PHONY: nrf52840
+nrf52840:
+	LIBTOCK_PLATFORM=nrf52840 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/nrf52840
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/nrf52840
+
+.PHONY: flash-nrf52840
+flash-nrf52840:
+	LIBTOCK_PLATFORM=nrf52840 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release) -- --deploy=tockloader
+
+.PHONY: raspberry_pi_pico
+raspberry_pi_pico:
+	LIBTOCK_PLATFORM=raspberry_pi_pico cargo run $(features) \
+		--target=thumbv6m-none-eabi $(release)
+	mkdir -p target/tbf/raspberry_pi_pico
+	cp target/thumbv6m-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv6m-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/raspberry_pi_pico
+
+.PHONY: nano_rp2040_connect
+nano_rp2040_connect:
+	LIBTOCK_PLATFORM=nano_rp2040_connect cargo run $(features) \
+		--target=thumbv6m-none-eabi $(release)
+	mkdir -p target/tbf/nano_rp2040_connect
+	cp target/thumbv6m-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv6m-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/nano_rp2040_connect
+
+.PHONY: stm32f3discovery
+stm32f3discovery:
+	LIBTOCK_PLATFORM=stm32f3discovery cargo run \
+		$(features) --target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/stm32f3discovery
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/stm32f3discovery
+
+.PHONY: stm32f412gdiscovery
+stm32f412gdiscovery:
+	LIBTOCK_PLATFORM=stm32f412gdiscovery cargo run \
+		$(features) --target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/stm32f412gdiscovery
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/stm32f412gdiscovery
+
+.PHONY: opentitan
+opentitan:
+	LIBTOCK_PLATFORM=opentitan cargo run $(features) \
+		--target=riscv32imc-unknown-none-elf $(release)
+	mkdir -p target/tbf/opentitan
+	cp target/riscv32imc-unknown-none-elf/release/$(APP_NAME).tab \
+		target/riscv32imc-unknown-none-elf/release/$(APP_NAME).tbf \
+		target/tbf/opentitan
+
+.PHONY: hifive1
+hifive1:
+	LIBTOCK_PLATFORM=hifive1 cargo run $(features) \
+		--target=riscv32imac-unknown-none-elf $(release)
+	mkdir -p target/tbf/hifive1
+	cp target/riscv32imac-unknown-none-elf/release/$(APP_NAME).tab \
+		target/riscv32imac-unknown-none-elf/release/$(APP_NAME).tbf \
+		target/tbf/hifive1
+
+.PHONY: nrf52
+nrf52:
+	LIBTOCK_PLATFORM=nrf52 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/nrf52
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/nrf52
+
+.PHONY: flash-nrf52
+flash-nrf52:
+	LIBTOCK_PLATFORM=nrf52 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release) -- --deploy=tockloader
+
+.PHONY: imxrt1050
+imxrt1050:
+	LIBTOCK_PLATFORM=imxrt1050 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/imxrt1050
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/imxrt1050
+
+.PHONY: msp432
+msp432:
+	LIBTOCK_PLATFORM=msp432 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/msp432
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/msp432
+
+.PHONY: clue_nrf52840
+clue_nrf52840:
+	LIBTOCK_PLATFORM=clue_nrf52840 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release)
+	mkdir -p target/tbf/clue_nrf52840
+	cp target/thumbv7em-none-eabi/release/$(APP_NAME).tab \
+		target/thumbv7em-none-eabi/release/$(APP_NAME).tbf \
+		target/tbf/clue_nrf52840
+
+.PHONY: flash-clue_nrf52840
+flash-clue_nrf52840:
+	LIBTOCK_PLATFORM=clue_nrf52840 cargo run $(features) \
+		--target=thumbv7em-none-eabi $(release) -- --deploy=tockloader
+
+.PHONY: clean
+clean:
+	cargo clean
+	$(MAKE) -C tock clean

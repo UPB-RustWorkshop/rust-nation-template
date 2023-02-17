@@ -49,9 +49,12 @@ mod flash_bootloader;
 pub static mut STACK_MEMORY: [u8; 0x1500] = [0; 0x1500];
 
 // Function for the process console to reboot the raspberry pi pico.
-fn reboot_function() {
+fn reboot_function() -> ! {
     unsafe {
         cortexm0p::scb::reset();
+    }
+    loop {
+        cortexm0p::support::nop();
     }
 }
 
@@ -89,6 +92,8 @@ pub struct PicoExplorerBase {
     button: &'static capsules::button::Button<'static, RPGpioPin<'static>>,
     screen: &'static capsules::screen::Screen<'static>,
 
+    // TODO define the smarthome driver
+
     scheduler: &'static RoundRobinSched<'static>,
     systick: cortexm0p::systick::SysTick,
 }
@@ -109,6 +114,8 @@ impl SyscallDriverLookup for PicoExplorerBase {
 
             capsules::button::DRIVER_NUM => f(Some(self.button)),
             capsules::screen::DRIVER_NUM => f(Some(self.screen)),
+
+            // TODO register the smarthome driver
 
             _ => f(None),
         }
@@ -357,7 +364,7 @@ pub unsafe fn main() {
         strings,
         mux_alarm,
         dynamic_deferred_caller,
-        Some(&reboot_function),
+        None,
     )
     .finalize(components::cdc_acm_component_static!(
         rp2040::usb::UsbCtrl,
@@ -545,13 +552,16 @@ pub unsafe fn main() {
         .finalize(components::process_printer_text_component_static!());
     PROCESS_PRINTER = Some(process_printer);
 
+    // TODO instantiate the smarthome driver
+    // Hint: use static_init!(Smarthome, new_function)
+
     // PROCESS CONSOLE
     let process_console = components::process_console::ProcessConsoleComponent::new(
         board_kernel,
         uart_mux,
         mux_alarm,
         process_printer,
-        Some(&reboot_function)
+        Some(reboot_function)
     )
     .finalize(components::process_console_component_static!(RPTimer));
     let _ = process_console.start();
@@ -574,6 +584,8 @@ pub unsafe fn main() {
 
         button,
         screen,
+
+        // TODO smarthome driver
 
         scheduler,
         systick: cortexm0p::systick::SysTick::new_with_calibration(125_000_000),
