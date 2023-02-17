@@ -8,6 +8,8 @@ To work, the smarthome device has the folllowing components:
   temperature) and send the it to the driver for storing
 3. a ui app that displays the doors status and the temperature
 
+![Smarthome](extra/smarthome.png)
+
 For this tutorial you will have to implements the driver (1) and
 the service (2). The UI app (3) is already implemented using
 the C/C++ language.
