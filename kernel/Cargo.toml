@@ -1,8 +1,6 @@
 [workspace]
 members = [
-    "microbit_v2",
-    "pico_explorer_base",
-    "raspberry_pi_pico",
+    "smarthome",
     "drivers",
 ]
 exclude = [

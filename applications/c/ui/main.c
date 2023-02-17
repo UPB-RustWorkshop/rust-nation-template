@@ -3,8 +3,8 @@
 #include <timer.h>
 
 typedef struct {
-  bool door1;
-  bool door2;
+  bool door_a;
+  bool door_b;
 } doors_t;
 
 static doors_t get_doors(void) {
@@ -120,7 +120,7 @@ int main (void)
         snprintf(buffer, 99, "Temperature: %d", temperature);
         lv_meter_set_indicator_value(meter, indic, temperature);
         lv_label_set_text(temperature_label, buffer);
-        snprintf(buffer, 99, "Door1: %s, Door2: %s", doors.door1?"Closed":"Open", doors.door2?"Closed":"Open");
+        snprintf(buffer, 99, "Door A: %s, Door B: %s", doors.door_a?"Closed":"Open", doors.door_b?"Closed":"Open");
         lv_label_set_text(doors_label, buffer);
       }
       delay_ms(5);

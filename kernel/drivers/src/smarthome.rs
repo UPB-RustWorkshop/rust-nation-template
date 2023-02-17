@@ -44,7 +44,7 @@ impl SyscallDriver for SmartHome {
             // TODO implement the commands
             // - DRIVER_EXISTS -> CommandReturn::success()
 
-            // - SET_DOORS -> CommandReturn::success_u32_u32(door1, door2)
+            // - SET_DOORS -> CommandReturn::success_u32_u32(door_a, door_b)
             // - SET_TEMPERATURE -> Command_return::success_u32(temperature)
             // Hint: make sure you use interior mutability (Cell) for the values
             
