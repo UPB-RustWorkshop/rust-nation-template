@@ -160,3 +160,10 @@ has to ooad to, follow:
   - then it prints the RAM address
 
 Modify the `layouts/raspberry_pi_pico.ld` file and set the required addresses for the FLASH and RAM.
+
+## Extra
+
+Implement the following extra features:
+1. Turn ON the Pi's LED if one of the doors is open
+2. Use button X to set and un set the smarthouse's alarm. The alarm will sound (blink the LED) when it is ON
+if one of the doors is open more than 10 seconds.

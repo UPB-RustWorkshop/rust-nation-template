@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tock at RustNatiomn</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style/style.css"></link>
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Tock at RustNation
+
+.title[.center[![Tock at RustNation](images/rustnation.png)]]
+
+.left[
+Alexandru Radovici, Cristiana Andrei, Irina Bradu
+
+Ilustrations by [Mieuneli](http://miau.laura.ro)
+]
+
+---
+
+# Tock
+
+- A <b>preemptive</b> embedded OS (runs on MCUs)
+  - Cortex-M
+  - RISC-V
+- Uses memory protection (MPU required)
+- Has separate <b>kernel and user space</b>
+  - most embedded OS have the one piece software philosophy
+- Runs untrusted apps in user space
+- <b>Microkernel</b> architecture
+- Kernel (and drivers) written in Rust
+- Apps written in C/C++ or Rust (any language that can be compiled)
+
+.right[![Tock](images/tock.svg)]
+
+---
+
+# Tock Stack
+
+.splash[.center[![Stack](images/tock-stack.png)]]
+
+Image from https://github.com/tock/tock/tree/master/doc.
+
+---
+
+## Faults
+
+The kernal and the processes can fault
+
+.pre[
+````terminal
+---| Fault Status |---
+Data Access Violation:              true
+Forced Hard Fault:                  true
+Faulting Memory Address:            0x00000000
+Fault Status Register (CFSR):       0x00000082
+Hard Fault Status Register (HFSR):  0x40000000
+
+---| App Status |---
+App: crash_dummy   -   [Fault]
+ Events Queued: 0   Syscall Count: 0   Dropped Callback Count: 0
+ Restart Count: 0
+ Last Syscall: None
+
+ ╔═══════════╤══════════════════════════════════════════╗
+ ║  Address  │ Region Name    Used | Allocated (bytes)  ║
+ ╚0x20006000═╪══════════════════════════════════════════╝
+             │ ▼ Grant         948 |    948
+  0x20005C4C ┼───────────────────────────────────────────
+             │ Unused
+  0x200049F0 ┼───────────────────────────────────────────
+             │ ▲ Heap            0 |   4700               S
+  0x200049F0 ┼─────────────────────────────────────────── R
+             │ Data            496 |    496               A
+  0x20004800 ┼─────────────────────────────────────────── M
+             │ ▼ Stack          72 |   2048
+  0x200047B8 ┼───────────────────────────────────────────
+             │ Unused
+  0x20004000 ┴───────────────────────────────────────────
+             .....
+  0x00030400 ┬─────────────────────────────────────────── F
+             │ App Flash       976                        L
+  0x00030030 ┼─────────────────────────────────────────── A
+             │ Protected        48                        S
+  0x00030000 ┴─────────────────────────────────────────── H
+
+  R0 : 0x00000000    R6 : 0x20004894
+  R1 : 0x00000001    R7 : 0x20004000
+  R2 : 0x00000000    R8 : 0x00000000
+  R3 : 0x00000000    R10: 0x00000000
+  R4 : 0x00000000    R11: 0x00000000
+  R5 : 0x20004800    R12: 0x12E36C82
+  R9 : 0x20004800 (Static Base Register)
+  SP : 0x200047B8 (Process Stack Pointer)
+  LR : 0x000301B7
+  PC : 0x000300AA
+ YPC : 0x000301B6
+
+ APSR: N 0 Z 1 C 1 V 0 Q 0
+       GE 0 0 0 0
+ EPSR: ICI.IT 0x00
+       ThumbBit true
+
+ Cortex-M MPU
+  Region 0: base: 0x20004000, length: 8192 bytes; ReadWrite (0x3)
+  Region 1: base:    0x30000, length: 1024 bytes; ReadOnly (0x6)
+  Region 2: Unused
+  Region 3: Unused
+  Region 4: Unused
+  Region 5: Unused
+  Region 6: Unused
+  Region 7: Unused
+
+To debug, run `make debug RAM_START=0x20004000 FLASH_INIT=0x30059`
+in the app's folder and open the .lst file.
+````]
+
+
+---
+
+class: split-50
+## System Call
+
+.column[
+API provided by the OS
+- ABI (Application Binary Interface)
+- uses the `svc` (or similar) instruction
+
+Applications request an action from the OS
+
+.card[.small_vertical[![System Call](images/sep_system_call.png)]]
+]
+
+.column[
+.center[.splash_vertical[![Scheduler](images/syscall.svg)]]
+]
+
+---
+## Tock System Calls
+
+0. Yield
+1. Subscribe
+2. Command
+3. AllowReadWrite
+4. AllowReadOnly
+5. Memop
+6. Exit
+7. UserspaceReadableAllow
+
+---
+
+### 2: Command
+
+Command instructs the driver to perform a specific action.
+
+```rust
+command(driver: u32, command_number: u32, argument1: u32, argument2: u32) -> CommandReturn;
+```
+
+#### Arguments
+
+ - `driver`: An integer specifying which driver to call.
+ - `command_number`: An integer specifying the requested command.
+ - `argument1`: A command-specific argument.
+ - `argument2`: A command-specific argument.
+
+- One Tock convention with the Command syscall is that command number 0 will
+always return a value of 0 or greater if the driver is supported.
+
+#### Return
+
+ - `ENODEVICE` if `driver` does not refer to a valid kernel driver.
+ - `ENOSUPPORT` if the driver exists but doesn't support the `command_number`.
+ - Other return codes based on the specific driver.
+
+---
+
+## Project
+
+The purpose of this turtorial is to build a simple smart home device.
+
+To work, the smart home device has the folllowing components:
+1. a smart home kernel driver that will act as the data model
+2. a smart home service that will pull the data from the sensors (doors,
+  temperature) and send the it to the driver for storing
+3. a ui app that displays the doors status and the temperature
+
+.small[.center[![Smarthome](images/smarthome.png)]]
+
+
+For this tutorial you will have to implements the driver (1) and
+the service (2). The UI app (3) is already implemented using
+the C/C++ language.
+
+---
+
+### Github Classroom
+
+We will use GitHub Classroom and Codespaces for the project.
+
+.center[.large[![Classroom](images/classroom.png)]]
+
+---
+
+# Thank you
+
+Alexandru Radovici - alexandru.radovici@oxidos.io
+
+Cristiana Andrei - cristiana.andrei@wyliodrin.com
+
+Irina Bradu - irina.bradu@wyliodrin.com
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script src="script/playground.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+		navigation: {
+				scroll: false
+			}
+    });
+    </script>
+  </body>
+</html>
