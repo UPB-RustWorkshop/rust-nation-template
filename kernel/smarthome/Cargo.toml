@@ -1,0 +1,15 @@
+[package]
+name = "smarthome"
+version.workspace = true
+authors.workspace = true
+build = "build.rs"
+edition.workspace = true
+
+[dependencies]
+cortexm0p = { path = "../tock/arch/cortex-m0p" }
+capsules = { path = "../tock/capsules" }
+kernel = { path = "../tock/kernel", features = ["debug_load_processes"] }
+rp2040 = { path = "../tock/chips/rp2040" }
+components = { path = "../tock/boards/components" }
+enum_primitive = { path = "../tock/libraries/enum_primitive" }
+drivers = { path = "../drivers" }

@@ -4,13 +4,10 @@
 #![no_std]
 
 use core::fmt::Write;
-use libtock::alarm::{Alarm, Milliseconds};
-use libtock::buttons::Buttons;
 use libtock::console::Console;
 use libtock::platform::{ErrorCode, Syscalls};
 use libtock::runtime::TockSyscalls;
 use libtock::runtime::{set_main, stack_size};
-use libtock::temperature::Temperature;
 
 set_main! {main}
 stack_size! {1024}

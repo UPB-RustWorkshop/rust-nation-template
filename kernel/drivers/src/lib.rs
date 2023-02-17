@@ -1,4 +1,5 @@
 #![forbid(unsafe_code)]
 #![no_std]
 
-pub mod smarthome;
+
+// TODO export the smarthome
