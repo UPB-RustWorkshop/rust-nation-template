@@ -1,11 +1,6 @@
 {
     // "build": { "dockerfile": "Dockerfile" },
     "image": "rustworkshop/tock_rustnation:1.0.3",
-    "hostRequirements": {
-        "cpus": 16,
-        "memory": "32gb",
-        "storage": "128gb" 
-    },
     "customizations": {
         "vscode": {
             "extensions": [
